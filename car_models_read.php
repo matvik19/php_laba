@@ -21,7 +21,7 @@ $car_models = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="container">
     <h1 class="mt-5">Модели автомобилей</h1>
     <a href="car_models_create.php" class="btn btn-primary mb-3">Добавить модель автомобиля</a>
-    <a href="index.php" class="btn btn-secondary mb-3">Назад на главную</a>
+    <a href="admin.php" class="btn btn-secondary mb-3">Назад на главную</a>
 
     <table class="table table-bordered">
         <thead class="thead-white">

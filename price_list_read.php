@@ -20,7 +20,7 @@ $prices = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <body class="container">
     <h1 class="mt-5">Прайс-лист</h1>
     <a href="price_list_create.php" class="btn btn-primary mb-3">Добавить запись</a>
-    <a href="index.php" class="btn btn-secondary mb-3">Назад на главную</a>
+    <a href="admin.php" class="btn btn-secondary mb-3">Назад на главную</a>
 
     <table class="table table-bordered">
         <thead class="thead-white">
