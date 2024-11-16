@@ -1,0 +1,69 @@
+<?php
+include 'db.php';
+
+// Получаем список клиентов
+$clientsQuery = "SELECT client_id, client_full_name FROM clients";
+$clientsStmt = $pdo->query($clientsQuery);
+$clients = $clientsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Получаем список моделей автомобилей
+$modelsQuery = "SELECT model_id, model_name FROM car_models";
+$modelsStmt = $pdo->query($modelsQuery);
+$models = $modelsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $client_id = $_POST['client_id'];
+    $model_id = $_POST['model_id'];
+    $sale_date = $_POST['sale_date'];
+    $contract_number = $_POST['contract_number'];
+
+    $stmt = $pdo->prepare("INSERT INTO sales (client_id, model_id, sale_date, contract_number) 
+                           VALUES (?, ?, ?, ?)");
+    $stmt->execute([$client_id, $model_id, $sale_date, $contract_number]);
+
+    header("Location: sales_read.php");
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить продажу</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container">
+    <h1 class="mt-5">Добавить новую продажу</h1>
+    <form method="POST">
+        <div class="form-group">
+            <label>Клиент:</label>
+            <select name="client_id" class="form-control" required>
+                <option value="">Выберите клиента</option>
+                <?php foreach ($clients as $client): ?>
+                    <option value="<?= $client['client_id'] ?>"><?= htmlspecialchars($client['client_full_name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Модель автомобиля:</label>
+            <select name="model_id" class="form-control" required>
+                <option value="">Выберите модель</option>
+                <?php foreach ($models as $model): ?>
+                    <option value="<?= $model['model_id'] ?>"><?= htmlspecialchars($model['model_name']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Дата продажи:</label>
+            <input type="date" name="sale_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Номер договора:</label>
+            <input type="text" name="contract_number" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Добавить</button>
+        <a href="sales_read.php" class="btn btn-secondary">Назад</a>
+    </form>
+</body>
+</html>
