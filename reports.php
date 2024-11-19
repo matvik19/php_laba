@@ -1,3 +1,12 @@
+<?php
+include 'header.php'; // Подключаем header.php для отображения стандартного интерфейса
+
+if (!isset($_SESSION['user']) || !in_array($_SESSION['user']['role_name'], ['Оператор', 'Админ'])) {
+    echo "<div class='alert alert-danger'>Доступ запрещен. Требуются права оператора или администратора.</div>";
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -11,7 +20,6 @@
 <body class="container">
     <h1>Отчет о реализации автомобилей</h1>
 
-    <!-- Кнопка Назад -->
     <a href="index.php" class="btn btn-secondary mb-3">Назад</a>
 
     <form method="GET" action="">
@@ -123,3 +131,5 @@
 </body>
 
 </html>
+
+

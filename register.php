@@ -17,17 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Все поля обязательны для заполнения.";
     }
 
-    // Проверка длины пароля
     if (strlen($password) < 6) {
         $errors[] = "Пароль должен содержать не менее 6 символов.";
     }
 
-    // Проверка совпадения паролей
     if ($password !== $confirm_password) {
         $errors[] = "Пароли не совпадают.";
     }
 
-    // Проверка корректности email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors[] = "Некорректный email.";
     }
@@ -59,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// После обработки формы, подключаем заголовок
+// подключаем хедер
 include 'header.php';
 ?>
 
@@ -103,6 +100,4 @@ include 'header.php';
     <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
 </form>
 
-<?php
-include 'footer.php';
-?>
+

@@ -1,12 +1,10 @@
 <?php
-// admin.php
 include 'db.php';
 include 'header.php';
 
 // Проверка, что пользователь авторизован и является администратором
 if (!isset($_SESSION['user']) || $_SESSION['user']['role_name'] !== 'Админ') {
     echo "<div class='alert alert-danger'>Доступ запрещен. Требуются права администратора.</div>";
-    include 'footer.php';
     exit;
 }
 
@@ -22,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_user_id'])) {
     // Назначение роли "Оператор"
     $stmt = $pdo->prepare("UPDATE users SET role_id = (SELECT role_id FROM roles WHERE role_name = 'Оператор') WHERE user_id = :user_id");
     $stmt->execute(['user_id' => $approve_user_id]);
-    // Перезагрузка страницы
+    // Обновление страницы
     header("Location: admin.php");
     exit;
 }
@@ -63,6 +61,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['approve_user_id'])) {
 
 <?php include 'main_crud.php'; ?>
 
-<?php
-include 'footer.php';
-?>
+

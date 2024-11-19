@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $token = bin2hex(random_bytes(16));
                 setcookie('remember_me', $token, time() + (86400 * 30), "/"); // 30 дней
 
-                // Сохранение токена в базе данных (добавьте поле remember_token в таблицу users)
+                // Сохранение токена в базе данных
                 $stmt = $pdo->prepare("UPDATE users SET remember_token = :token WHERE user_id = :user_id");
                 $stmt->execute(['token' => $token, 'user_id' => $user['user_id']]);
             }
@@ -83,6 +83,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <button type="submit" class="btn btn-primary">Войти</button>
 </form>
 
-<?php
-include 'footer.php';
-?>
+

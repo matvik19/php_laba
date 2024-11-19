@@ -8,7 +8,6 @@ if (isset($_SESSION['user'])) {
     if ($user['role_name'] === 'Админ') {
         $pageContent = "Добро пожаловать, Админ! Вы можете управлять системой.";
     } elseif ($user['role_name'] === 'Оператор') {
-        // Получение приветственного сообщения или статистики
         if ($user['visit_count'] === 1) {
             $pageContent = "Добро пожаловать!";
         } else {
@@ -39,6 +38,3 @@ if (isset($_SESSION['user'])) {
     <?= $pageContent ?>
 </div>
 
-<?php
-include 'footer.php';
-?>
