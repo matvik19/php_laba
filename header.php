@@ -2,6 +2,7 @@
 // header.php
 session_start();
 
+// Подключение к базе данных, если пользователь не в сессии, но есть куки
 if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
     include 'db.php';
     $token = $_COOKIE['remember_me'];
@@ -16,8 +17,24 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
             'username' => $user['username'],
             'role_name' => $user['role_name'],
             'last_login' => $user['last_login'],
-            'visit_count' => $user['visit_count']
+            'visit_count' => $user['visit_count'],
+            'header_color' => $user['header_color'] // Добавляем цвет заголовка в сессию
         ];
+    }
+}
+
+// Если пользователь уже в сессии, убедимся, что `header_color` присутствует
+if (isset($_SESSION['user'])) {
+    if (!isset($_SESSION['user']['header_color'])) {
+        include 'db.php';
+        $stmt = $pdo->prepare("SELECT header_color FROM users WHERE user_id = :user_id");
+        $stmt->execute(['user_id' => $_SESSION['user']['user_id']]);
+        $result = $stmt->fetch();
+        if ($result) {
+            $_SESSION['user']['header_color'] = $result['header_color'];
+        } else {
+            $_SESSION['user']['header_color'] = 'light'; // Значение по умолчанию
+        }
     }
 }
 ?>
@@ -25,13 +42,31 @@ if (!isset($_SESSION['user']) && isset($_COOKIE['remember_me'])) {
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Коммерческие Фирмы - <?php echo isset($pageTitle) ? $pageTitle : 'Главная'; ?></title>
+    <title>Коммерческие Фирмы - <?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) : 'Главная'; ?></title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<?php
+// Определение класса цвета для navbar
+$headerColorClass = 'bg-light'; // Значение по умолчанию
+if (isset($_SESSION['user']['header_color'])) {
+    switch ($_SESSION['user']['header_color']) {
+        case 'blue':
+            $headerColorClass = 'bg-primary';
+            break;
+        case 'green':
+            $headerColorClass = 'bg-success';
+            break;
+        case 'light':
+        default:
+            $headerColorClass = 'bg-light';
+            break;
+    }
+}
+?>
+<nav class="navbar navbar-expand-lg <?php echo $headerColorClass; ?> navbar-light">
   <a class="navbar-brand" href="index.php">Коммерческие Фирмы</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
           aria-controls="navbarNav" aria-expanded="false" aria-label="Переключить навигацию">

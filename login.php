@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Установка куки "Запомнить меня"
             if ($remember) {
                 $token = bin2hex(random_bytes(16));
-                setcookie('remember_me', $token, time() + (86400 * 30), "/"); // 30 дней
+                setcookie('remember_me', $token, time() + (86400 * 30), "/"); 
 
                 // Сохранение токена в базе данных
                 $stmt = $pdo->prepare("UPDATE users SET remember_token = :token WHERE user_id = :user_id");

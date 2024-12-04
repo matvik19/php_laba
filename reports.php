@@ -1,5 +1,5 @@
 <?php
-include 'header.php'; // Подключаем header.php для отображения стандартного интерфейса
+include 'header.php'; 
 
 if (!isset($_SESSION['user']) || !in_array($_SESSION['user']['role_name'], ['Оператор', 'Админ'])) {
     echo "<div class='alert alert-danger'>Доступ запрещен. Требуются права оператора или администратора.</div>";
@@ -30,12 +30,13 @@ if (!isset($_SESSION['user']) || !in_array($_SESSION['user']['role_name'], ['О�
 
     <?php
     $host = 'localhost';
-    $dbname = 'laba1';
+    $dbname = 'laba';
     $user = 'postgres';
     $password = '584252302';
+    $port = '5433';
 
     try {
-        $dsn = "pgsql:host=$host;dbname=$dbname";
+        $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
         $pdo = new PDO($dsn, $user, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     } catch (PDOException $e) {
         die("Ошибка подключения к базе данных: " . $e->getMessage());

@@ -56,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// подключаем хедер
 include 'header.php';
 ?>
 
