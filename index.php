@@ -34,6 +34,20 @@ if (isset($_SESSION['user'])) {
     $_SESSION['user']['visit_count'] += 1;
 }
 
+// Обработка формы для запроса характеристик автомобилей
+$cars = [];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['min_price']) && isset($_POST['max_price'])) {
+    $min_price = $_POST['min_price'];
+    $max_price = $_POST['max_price'];
+
+    // Выполнение запроса к базе данных
+    $stmt = $pdo->prepare("SELECT * FROM get_car_technical_specs(:min_price, :max_price)");
+    $stmt->bindParam(':min_price', $min_price, PDO::PARAM_STR);
+    $stmt->bindParam(':max_price', $max_price, PDO::PARAM_STR);
+    $stmt->execute();
+    $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 if (isset($_SESSION['user'])) {
     $user = $_SESSION['user'];
     if ($user['role_name'] === 'Админ') {
@@ -55,17 +69,35 @@ if (isset($_SESSION['user'])) {
     $currentColor = isset($user['header_color']) ? $user['header_color'] : 'light';
     $pageContent .= "
         <hr>
-        <h2>Выберите цвет заголовка</h2>
-        <form action='index.php' method='post'>
+        <div class='header-color-container'>
+            <form action='index.php' method='post' class='header-color-form'>
+                <div class='form-group'>
+                    <label for='header_color'>Выберите цвет темы:</label>
+                    <select class='form-control' id='header_color' name='header_color' required>
+                        <option value='light' " . ($currentColor === 'light' ? 'selected' : '') . ">Светлый</option>
+                        <option value='blue' " . ($currentColor === 'blue' ? 'selected' : '') . ">Синий</option>
+                        <option value='green' " . ($currentColor === 'green' ? 'selected' : '') . ">Зелёный</option>
+                    </select>
+                </div>
+                <button type='submit' class='btn btn-primary'>Сохранить</button>
+            </form>
+        </div>
+    ";
+
+    // Форма для выбора диапазона цен
+    $pageContent .= "
+        <hr>
+        <h2>Выберите диапазон цен</h2>
+        <form method='POST'>
             <div class='form-group'>
-                <label for='header_color'>Цвет:</label>
-                <select class='form-control' id='header_color' name='header_color' required>
-                    <option value='light' " . ($currentColor === 'light' ? 'selected' : '') . ">Светлый</option>
-                    <option value='blue' " . ($currentColor === 'blue' ? 'selected' : '') . ">Синий</option>
-                    <option value='green' " . ($currentColor === 'green' ? 'selected' : '') . ">Зелёный</option>
-                </select>
+                <label for='min_price'>Минимальная цена:</label>
+                <input type='number' name='min_price' id='min_price' class='form-control' required>
             </div>
-            <button type='submit' class='btn btn-primary'>Сохранить</button>
+            <div class='form-group'>
+                <label for='max_price'>Максимальная цена:</label>
+                <input type='number' name='max_price' id='max_price' class='form-control' required>
+            </div>
+            <button type='submit' class='btn btn-primary'>Поиск</button>
         </form>
     ";
 } else {
@@ -81,15 +113,80 @@ if (isset($_SESSION['user'])) {
         </form>
     ";
 }
+
 ?>
 
-<div class="jumbotron">
-    <?= $pageContent ?>
-</div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Коммерческие фирмы</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Позиционируем форму для выбора цвета в правом верхнем углу */
+        .header-color-container {
+            position: fixed;
+            top: 110px;
+            right: 20px;
+            width: 250px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
 
-<!-- Закрывающие теги HTML -->
-</div> <!-- Закрытие контейнера -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+        .header-color-form {
+            margin: 0;
+        }
+
+        .header-color-form button {
+            font-size: 14px;
+            padding: 6px 12px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="jumbotron">
+        <?= $pageContent ?>
+
+        <!-- Отображение результатов поиска автомобилей -->
+        <?php if (!empty($cars)): ?>
+            <h2>Технические характеристики автомобилей</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Модель</th>
+                        <th>Цвет</th>
+                        <th>Обивка</th>
+                        <th>Мощность двигателя</th>
+                        <th>Количество дверей</th>
+                        <th>Тип трансмиссии</th>
+                        <th>Цена</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($cars as $car): ?>
+                        <tr>
+                            <td><?= htmlspecialchars($car['model_name']) ?></td>
+                            <td><?= htmlspecialchars($car['model_color']) ?></td>
+                            <td><?= htmlspecialchars($car['model_upholstery']) ?></td>
+                            <td><?= htmlspecialchars($car['engine_power']) ?></td>
+                            <td><?= htmlspecialchars($car['door_count']) ?></td>
+                            <td><?= htmlspecialchars($car['transmission_type']) ?></td>
+                            <td><?= htmlspecialchars($car['car_price']) ?> ₽</td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <div class="alert alert-info mt-3">В указанном диапазоне данных нет.</div>    
+        <?php endif; ?>
+    </div>
+
+    <!-- Закрывающие теги HTML -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
